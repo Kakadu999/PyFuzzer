@@ -4,7 +4,8 @@ A simple mass fuzzer scan written is python.
 How to use : 
   Can define default values directly in the program or use the command line arguments below to edit them.
   Command line arguments :
-    	-h, --help : help screen.
+    
+      -h, --help : help screen.
   
     	-e, --extensions <filetype> : extension to append to searched files instead of using the default one, need to add file search to be used.
     	e.g : fuzz.py -f -e html,pdf
