@@ -39,3 +39,4 @@ Next stuff to implements :
 - Blacklisting, to avoid some directory names
 - Pause, to slow down packet sending
 - Download, download every files scanned
+- Change HTTP Method, to change the method used
