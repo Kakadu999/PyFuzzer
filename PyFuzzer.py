@@ -104,22 +104,9 @@ def help_screen() -> None:
 	print(help)
 	exit(0)
 
-def args_parser(_argv) -> dict : 
+def args_parser(_argv, _arguments_dict) -> dict : 
 
-	arguments = {
-		"wordlist" 		: None,
-		"url" 			: None,
-		"file_search" 	: None,
-		"string_search" : None,
-		"extension" 	: None,
-		"logging" 		: None,
-		"ignore_list" 	: None,
-		"blacklist" 	: None, 
-		"pause" 		: None,
-		"download"		: None,
-		"method" 		: None,
-		"page_length"	: None
-	}
+	arguments = _arguments_dict
 
 	for index, value in enumerate(_argv) : 
 		match value:
@@ -170,36 +157,27 @@ def args_parser(_argv) -> dict :
 
 	return arguments
 	
-def send_request_and_get_status(
-	_url 			= None, 
-	_ignore_list 	= [], 
-	_page_length 	= 0, 
-	_string_search 	= [], 
-	_logger 		= None,
-	_method 		= "GET",
-	_pause 			= 0,
-	) :
-	
+def send_request_and_get_status(_url, _argv) :
 	
 	try:
-		if _pause > 0 :
-			time.sleep(_pause / 1000)
+		if _argv["pause"] > 0 :
+			time.sleep(_argv["pause"] / 1000)
 
 		url = _url if _url.find("http") == 0 else "http://" + _url
-		request_result = requests.request(_method, url=url)
+		request_result = requests.request(_argv["method"], url=url)
 
 		result = f"\t[!] - [{request_result.status_code}] [Pg Len] = {len(request_result.text)} | {url} "
 
-		if request_result.status_code not in _ignore_list and len(request_result.text) >= _page_length:
-			if len(_string_search) > 0 :
-				for string in _string_search : 
+		if request_result.status_code not in _argv["ignore_list"] and len(request_result.text) >= _argv["page_length"]:
+			if len(_argv["string_search"]) > 0 :
+				for string in _argv["string_search"] : 
 					if request_result.text.lower().find(string.lower()) != -1:
 						result += "| found '" + string + "' "
 						
 			print(result)
 
-			if not (_logger is None) : 
-				_logger.info(result)
+			if not (_argv["logger"] is None) : 
+				_argv["logger"].info(result)
 
 	except KeyboardInterrupt :
 		print("\t[X] - Interruped, EXITING...")
@@ -208,69 +186,36 @@ def send_request_and_get_status(
 
 	return request_result.status_code
 
-def recursive_fuzzer(
-	_url 			= "", 
-	_ignore_list 	= [], 
-	_wordlist 		= [], 
-	_path_list 		= [], 
-	_string_search 	= [],
-	_exlist 		= [],
-	_file_search 	= False,
-	_logger 		= "",
-	_method 		= "",
-	_pause 			= 0,
-	_page_length 	= 0,
-	):
+def recursive_fuzzer(_argv, _path_list):
 
 	path_list = _path_list
-	file_search = _file_search
+	file_search = _argv["file_search"]
 
 	try :
-		for word in _wordlist : 
-			new_url = new_url_name(_url, path_list)
+		for word in _argv["loaded_wordlist"] : 
+			new_url = new_url_name(_argv["url"], path_list)
 
 			if file_search : 
 				extension_fuzzer(
-					_url 			= new_url, 
-					_ignore_list 	= _ignore_list, 
-					_exlist 		= _exlist, 
-					_wordlist 		= _wordlist, 
-					_string_search 	= _string_search, 
-					_logger 		= _logger,
-					_method 		= _method,
-					_pause 			= _pause,
-					_page_length 	= _page_length
-					)
+					_url 	= new_url, 
+					_argv	= _argv
+				)
 				file_search 		= False
 
 			new_url = new_url.replace("fuzz", clean_word(word))
 			status = send_request_and_get_status(
-				_url 			= new_url,
-				_ignore_list 	= _ignore_list,
-				_page_length 	= _page_length,
-				_string_search 	= _string_search, 
-				_logger 		= _logger, 
-				_method 		= _method,
-				_pause 			= _pause,
-				)
+				_url 	= new_url,
+				_argv	= _argv
+			)
 			
 			# CAREFUL : Can go into an infinite loop if the ignore list is badly defined.
-			if status not in _ignore_list : 
+			if status not in _argv["ignore_list"] : 
 				# Append newfound folder to pathlist.
 				path_list.append(word)
 				recursive_fuzzer(
-					_url 			= _url, 
-					_ignore_list 	= _ignore_list, 
-					_wordlist 		= _wordlist, 
-					_path_list 		= path_list,
-					_string_search 	= _string_search,
-					_exlist 		= _exlist,
-					_file_search 	= _file_search,
-					_logger 		= _logger,
-					_method  		= _method,
-					_pause 			= _pause,
-					_page_length 	= _page_length
-					)
+					_argv = _argv, 
+					_path_list = path_list
+				)
 
 		try:
 			path_list.pop()
@@ -280,60 +225,33 @@ def recursive_fuzzer(
 		print("\t[X] - Interruped, EXITING...")
 		exit()
 
-def extension_fuzzer(
-	_url 			= "",
-	_ignore_list 	= [], 
-	_exlist 		= [], 
-	_wordlist 		= [], 
-	_string_search 	= [], 
-	_logger 		= "",
-	_method 		= "",
-	_pause 			= 0,
-	_page_length 	= 0,
-	):
+def extension_fuzzer(_url, _argv):
 
 	try:
-		for word in _wordlist : 
+		for word in _argv["loaded_wordlist"] : 
 			url = _url.replace("fuzz", clean_word(word))
 			req_list = list(map(lambda ex : send_request_and_get_status(
-				_url 			= url + '.' + ex, 
-				_ignore_list 	= _ignore_list,
-				_page_length 	= _page_length,
-				_string_search 	= _string_search, 
-				_logger 		= _logger, 
-				_method 		= _method,
-				_pause 			= _pause,
-				), _exlist))
+				_url 	= url + '.' + ex, 
+				_argv	= _argv
+				), _argv["extension"]))
 
 	except KeyboardInterrupt:
 		print("\t[X] - Interruped, EXITING...")
 		exit()
 
-def load_ressources(
-	_url,
-	_wordlist,
-	_file_search,
-	_string_search,
-	_exlist,
-	_ignore_list,
-	_logging, 
-	_blacklist,
-	_pause,
-	_download,
-	_method,
-	_page_length,
-	) :
+def load_ressources(_argv) :
 	
+	argv = _argv
+
 	try :
 
 		# Check for problems
-		if _url.lower().find("fuzz") == -1:
+		if argv["url"].lower().find("fuzz") == -1:
 			raise Exception("URL contain no 'fuzz' landmark, aborting...")
 
+		argv["loaded_wordlist"] = load_wordlist(argv["wordlist"])
 
-		logger = None
-
-		if _logging : 
+		if argv["logging"] : 
 			logger = logging.getLogger(__name__)
 			logger.setLevel(logging.INFO)
 
@@ -343,18 +261,9 @@ def load_ressources(
 			handler.setFormatter(formatter)
 			logger.addHandler(handler )
 
-		recursive_fuzzer(
-				_url 			= _url, 
-				_wordlist 		= load_wordlist(_wordlist), 
-				_file_search 	= _file_search, 
-				_logger			= logger,
-				_string_search 	= _string_search, 
-				_exlist 		= _exlist,
-				_ignore_list 	= _ignore_list, 
-				_method 		= _method,
-				_pause 			= _pause,
-				_page_length 	= _page_length
-			)
+			argv["logger"] = logger
+
+		recursive_fuzzer(_argv = argv, _path_list = [])
 			
 	except IOError as e: 
 		errors_handler(e)
@@ -378,36 +287,43 @@ def main():
 	DEFAULT_PAGE_LENGTH		= 0
 	
 	#GATHER ARGUMENTS
-	arguments = args_parser(sys.argv)
+	arguments = {
+		"url" 				: None,
+		"wordlist" 			: None,
+		"file_search" 		: None,
+		"string_search" 	: None,
+		"extension" 		: None,
+		"logging" 			: None,
+		"ignore_list" 		: None,
+		"blacklist" 		: None, 
+		"pause" 			: None,
+		"download"			: None,
+		"method" 			: None,
+		"page_length"		: None, 
+		"logger"			: None,
+		"loaded_wordlist"	: None,
+	}
 
-	#ASSIGN CONSTANT
-	URL 			= DEFAULT_URL if arguments["url"] is None else arguments["url"]
-	WORDLIST 		= DEFAULT_WORDLIST if arguments["wordlist"] is None else arguments["wordlist"]
-	FILE_SEARCH 	= DEFAULT_FILE_SEARCH if arguments["file_search"] is None else arguments["file_search"]
-	STRING_SEARCH 	= DEFAULT_STRING_SEARCH if arguments["string_search"] is None else arguments["string_search"]
-	EXTENSION 		= DEFAULT_EXTENSION if arguments["extension"] is None else arguments["extension"]
-	IGNORE_LIST 	= DEFAULT_IGNORE if arguments["ignore_list"] is None else arguments["ignore_list"]
-	LOGGING 		= DEFAULT_LOGGING if arguments["logging"] is None else arguments["logging"]
-	BLACKLIST 		= DEFAULT_BLACKLIST if arguments["blacklist"] is None else arguments["blacklist"] # Not implemented
-	PAUSE 			= DEFAULT_PAUSE if arguments["pause"] is None else arguments["pause"] # Not implemented
-	DOWNLOAD 		= DEFAULT_DOWNLOAD if arguments["download"] is None else arguments["download"] # Not implemented
-	METHOD			= DEFAULT_METHOD if arguments["method"] is None else arguments["method"]
-	PAGE_LENGTH 	= DEFAULT_PAGE_LENGTH if arguments["page_length"] is None else arguments["page_length"]
+	if len(sys.argv) > 1 :
+		arguments = args_parser(sys.argv, arguments)
+
+	#ASSIGN DICT VALUES
+	arguments['url'] 			= DEFAULT_URL if arguments["url"] is None else arguments["url"]
+	arguments["wordlist"] 		= DEFAULT_WORDLIST if arguments["wordlist"] is None else arguments["wordlist"]
+	arguments["file_search"] 	= DEFAULT_FILE_SEARCH if arguments["file_search"] is None else arguments["file_search"]
+	arguments["string_search"] 	= DEFAULT_STRING_SEARCH if arguments["string_search"] is None else arguments["string_search"]
+	arguments["extension"] 		= DEFAULT_EXTENSION if arguments["extension"] is None else arguments["extension"]
+	arguments["ignore_list"] 	= DEFAULT_IGNORE if arguments["ignore_list"] is None else arguments["ignore_list"]
+	arguments["logging"] 		= DEFAULT_LOGGING if arguments["logging"] is None else arguments["logging"]
+	arguments["blacklist"] 		= DEFAULT_BLACKLIST if arguments["blacklist"] is None else arguments["blacklist"] # Not implemented
+	arguments["pause"] 			= DEFAULT_PAUSE if arguments["pause"] is None else arguments["pause"] # Not implemented
+	arguments["download"] 		= DEFAULT_DOWNLOAD if arguments["download"] is None else arguments["download"] # Not implemented
+	arguments["method"]			= DEFAULT_METHOD if arguments["method"] is None else arguments["method"]
+	arguments["page_length"] 	= DEFAULT_PAGE_LENGTH if arguments["page_length"] is None else arguments["page_length"]
 
 	#LOAD EVERYTHING
 	load_ressources(
-	_url 			= URL,
-	_wordlist 		= WORDLIST,
-	_file_search 	= FILE_SEARCH,
-	_string_search 	= STRING_SEARCH,
-	_exlist 		= EXTENSION,
-	_ignore_list 	= IGNORE_LIST,
-	_logging 		= LOGGING, 
-	_blacklist 		= BLACKLIST,
-	_pause 			= PAUSE,
-	_download 		= DOWNLOAD,
-	_method 		= METHOD,
-	_page_length 	= PAGE_LENGTH
+	_argv = arguments
 	)
 
 	print()
