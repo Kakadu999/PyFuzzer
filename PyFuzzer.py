@@ -272,35 +272,35 @@ def main():
 	initial_screen()
 
 	#DEFAULT CONSTANT
-	CURRENT_VERSION			= "0.1 smth"
-	DEFAULT_URL 			= "localhost:8000/foldertree_test/fuzz"
-	DEFAULT_WORDLIST 		= "./wordlist.txt"
+	CURRENT_VERSION		= "0.1 smth"
+	DEFAULT_URL 		= "localhost:8000/foldertree_test/fuzz"
+	DEFAULT_WORDLIST 	= "./wordlist.txt"
 	DEFAULT_FILE_SEARCH   	= False
 	DEFAULT_STRING_SEARCH 	= ["password", "user"]
-	DEFAULT_EXTENSION 		= ["html", "pdf", "txt", "php"]
-	DEFAULT_IGNORE 			= [404, 501]
-	DEFAULT_LOGGING 		= False
-	DEFAULT_BLACKLIST 		= []
-	DEFAULT_PAUSE 			= 0
-	DEFAULT_DOWNLOAD 		= False
-	DEFAULT_METHOD			= "GET"
-	DEFAULT_PAGE_LENGTH		= 0
+	DEFAULT_EXTENSION 	= ["html", "pdf", "txt", "php"]
+	DEFAULT_IGNORE 		= [404, 501]
+	DEFAULT_LOGGING 	= False
+	DEFAULT_BLACKLIST 	= []
+	DEFAULT_PAUSE 		= 0
+	DEFAULT_DOWNLOAD 	= False
+	DEFAULT_METHOD		= "GET"
+	DEFAULT_PAGE_LENGTH	= 0
 	
 	#GATHER ARGUMENTS
 	arguments = {
-		"url" 				: None,
-		"wordlist" 			: None,
+		"url" 			: None,
+		"wordlist" 		: None,
 		"file_search" 		: None,
 		"string_search" 	: None,
 		"extension" 		: None,
-		"logging" 			: None,
+		"logging" 		: None,
 		"ignore_list" 		: None,
 		"blacklist" 		: None, 
-		"pause" 			: None,
-		"download"			: None,
-		"method" 			: None,
+		"pause" 		: None,
+		"download"		: None,
+		"method" 		: None,
 		"page_length"		: None, 
-		"logger"			: None,
+		"logger"		: None,
 		"loaded_wordlist"	: None,
 	}
 
@@ -308,7 +308,7 @@ def main():
 		arguments = args_parser(sys.argv, arguments)
 
 	#ASSIGN DICT VALUES
-	arguments['url'] 			= DEFAULT_URL if arguments["url"] is None else arguments["url"]
+	arguments['url'] 		= DEFAULT_URL if arguments["url"] is None else arguments["url"]
 	arguments["wordlist"] 		= DEFAULT_WORDLIST if arguments["wordlist"] is None else arguments["wordlist"]
 	arguments["file_search"] 	= DEFAULT_FILE_SEARCH if arguments["file_search"] is None else arguments["file_search"]
 	arguments["string_search"] 	= DEFAULT_STRING_SEARCH if arguments["string_search"] is None else arguments["string_search"]
@@ -316,9 +316,9 @@ def main():
 	arguments["ignore_list"] 	= DEFAULT_IGNORE if arguments["ignore_list"] is None else arguments["ignore_list"]
 	arguments["logging"] 		= DEFAULT_LOGGING if arguments["logging"] is None else arguments["logging"]
 	arguments["blacklist"] 		= DEFAULT_BLACKLIST if arguments["blacklist"] is None else arguments["blacklist"] # Not implemented
-	arguments["pause"] 			= DEFAULT_PAUSE if arguments["pause"] is None else arguments["pause"] # Not implemented
+	arguments["pause"] 		= DEFAULT_PAUSE if arguments["pause"] is None else arguments["pause"] # Not implemented
 	arguments["download"] 		= DEFAULT_DOWNLOAD if arguments["download"] is None else arguments["download"] # Not implemented
-	arguments["method"]			= DEFAULT_METHOD if arguments["method"] is None else arguments["method"]
+	arguments["method"]		= DEFAULT_METHOD if arguments["method"] is None else arguments["method"]
 	arguments["page_length"] 	= DEFAULT_PAGE_LENGTH if arguments["page_length"] is None else arguments["page_length"]
 
 	#LOAD EVERYTHING
