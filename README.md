@@ -1,8 +1,7 @@
 A simple mass fuzzer scan written is python.
 
-How to use : 
-  Can define default values directly in the program or use the command line arguments below to edit them.
-  Command line arguments :
+Can define default values directly in the program or use the command line arguments below to edit them.
+Command line arguments :
 ```
 -v, --version : Show version, then exit the program.
 
