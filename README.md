@@ -43,3 +43,4 @@ python .\PyFuzzer.py -w ..\..\wordlist.txt -u localhost:8000/foldertree_test/fuz
 Next stuff to implements :
 
 - Blacklisting, to avoid some directory names
+- Page length threshold and minimum blacklist, everything between these two values are blacklisted
