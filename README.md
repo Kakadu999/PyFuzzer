@@ -1,4 +1,4 @@
-A simple mass folder scanner written is python.
+A simple http mass folder scanner written is python.
 
 Can define default values directly in the program or use the command line arguments below to edit them.
 Command line arguments :
