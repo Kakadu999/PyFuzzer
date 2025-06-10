@@ -28,8 +28,6 @@ e.g : fuzz.py -f -s password,user,secret
 
 -p, --pause : Slow down the packet sending rate by adding a waiting time, in milliseconds. So 1000 is 1 second
 
--d, --download : not implemented, write every file scanned to the local host.
-
 -pl, --page-length : Set minimum page length
 
 -m, --method : Use another HTTP method
@@ -45,4 +43,3 @@ python .\PyFuzzer.py -w ..\..\wordlist.txt -u localhost:8000/foldertree_test/fuz
 Next stuff to implements :
 
 - Blacklisting, to avoid some directory names
-- Download, download every files scanned
