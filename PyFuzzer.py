@@ -7,7 +7,7 @@ import logging
 # Useful functions
 
 def load_wordlist(_filename : str) -> list : 
-	with open(_filename, "r") as f:
+	with open(_filename, "r", errors='ignore') as f:
 			loaded_wordlist = f.readlines()
 	return loaded_wordlist
 
