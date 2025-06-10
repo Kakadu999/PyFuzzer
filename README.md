@@ -1,4 +1,4 @@
-A simple mass fuzzer scan written is python.
+A simple mass folder scanner written is python.
 
 Can define default values directly in the program or use the command line arguments below to edit them.
 Command line arguments :
@@ -8,17 +8,17 @@ Command line arguments :
 -h, --help : Show the help screen then exit the program.
 
 -e, --extensions <filetype> : extension to append to searched files instead of using the default one, need to add file search to be used.
-e.g : fuzz.py -f -e html,pdf
+e.g : pyfuzzer.py -f -e html,pdf
 
 -w, --wordlist <path to file> : to use a wordlist.
-e.g : fuzz.py -w wordlist.txt
+e.g : pyfuzzer.py -w wordlist.txt
 
 -u, --url <hostname> : to define the hostname.
 
 -f, --file-search : to do a file scan
 
 -ss, --string-search <strings>: search for a string in every file scanned, need file search to work. It also put every files and strings to search to lowercase.
-e.g : fuzz.py -f -s password,user,secret
+e.g : pyfuzzer.py -f -s password,user,secret
 
 -i, --ignore <status code> : to ignore specific status code, 404 is activated by default to avoid infinite looping.
 
@@ -44,3 +44,4 @@ Next stuff to implements :
 
 - Blacklisting, to avoid some directory names
 - Page length threshold and minimum blacklist, everything between these two values are blacklisted
+- Create a tree view at the end of a scan
